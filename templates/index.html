@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="RCERT Smart Campus Digital Twin 2.0 — Location-aware weather, CAMS air-quality intelligence, conceptual 3D campus twin, and persistent advisories for RCERT Chandrapur.">
+  <title>RCERT · Campus Intelligence 2.0</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-v2.css') }}">
+  <script type="module" src="{{ url_for('static', filename='js/dashboard-v2.js') }}"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell" id="app-shell">
+    
+    <!-- NEXT-GENERATION SPATIAL NEXUS NAVIGATION -->
+    <header class="spatial-nexus-bar" id="spatial-nexus-bar" role="banner" aria-label="RCERT Spatial Control Navigation">
+      <div class="spatial-nexus-container">
+        
+        <!-- LEFT REGION: Identity & Brand Anchor -->
+        <div class="nexus-identity-pod">
+          <a class="nexus-brand" href="#dashboard" data-view-target="dashboard" aria-label="RCERT Campus Intelligence 2.0 home">
+            <div class="nexus-brand-crest">
+              <span class="crest-poly" aria-hidden="true">⬡</span>
+              <span class="crest-glyph">R</span>
+              <span class="crest-pulse" aria-hidden="true"></span>
+            </div>
+            <div class="nexus-brand-text">
+              <span class="brand-title">RCERT</span>
+              <span class="brand-badge">TWIN 2.0</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- CENTER REGION: Primary Desktop Spatial Navigation -->
+        <nav class="nexus-nav-capsule" aria-label="Main Navigation">
+          <div class="nav-list" id="nav-list">
+            <!-- Animated Sliding Laser/Glow Tracker Indicator -->
+            <div class="nav-indicator-glow" id="nav-indicator-glow" aria-hidden="true"></div>
+
+            <button class="nav-link is-active" type="button" data-view-target="dashboard" title="Campus Overview & Cinematic Walkthrough">
+              <span class="nav-icon" aria-hidden="true">⌂</span>
+              <span class="nav-text">Overview</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="weather" title="Live Weather & Air Quality">
+              <span class="nav-icon" aria-hidden="true">☼</span>
+              <span class="nav-text">Weather &amp; Air</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="campus" title="3D WebGL Digital Twin">
+              <span class="nav-icon" aria-hidden="true">◇</span>
+              <span class="nav-text">Campus Twin 3D</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="analytics" title="Weather Trends &amp; Environmental Analytics">
+              <span class="nav-icon" aria-hidden="true">⌁</span>
+              <span class="nav-text">Analytics</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="alerts" title="Campus Alert Center">
+              <span class="nav-icon" aria-hidden="true">△</span>
+              <span class="nav-text">Alerts Center</span>
+              <span class="nav-count" id="sidebar-alert-count" hidden>0</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="about" title="About RCERT Chandrapur">
+              <span class="nav-icon" aria-hidden="true">ℹ</span>
+              <span class="nav-text">About RCERT</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="reports" title="Weather, Air Quality &amp; Alert Reports">
+              <span class="nav-icon" aria-hidden="true">▤</span>
+              <span class="nav-text">Reports &amp; Export</span>
+            </button>
+            <button class="nav-link" type="button" data-view-target="settings" title="Display Preferences, Refresh Configuration &amp; System Diagnostics">
+              <span class="nav-icon" aria-hidden="true">⚙</span>
+              <span class="nav-text">Settings</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- RIGHT REGION: System Status, Telemetry & Action Controls -->
+        <div class="nexus-telemetry-pod">
+          <!-- API & System Telemetry Status -->
+          <div class="nexus-status-pill" title="Digital Twin System Health">
+            <span class="meta-dot is-online" id="system-dot"></span>
+            <span class="meta-status" id="system-label">OPERATIONAL</span>
+          </div>
+
+          <!-- Fullscreen Presentation Mode Toggle -->
+          <button class="nexus-tool-btn presentation-btn" id="presentation-toggle" type="button" title="Toggle Fullscreen Presentation Mode">
+            <span class="tool-icon" aria-hidden="true">📽️</span>
+            <span id="pres-label" class="tool-label">Present</span>
+          </button>
+
+          <!-- Refresh Data Action -->
+          <button class="nexus-tool-btn refresh-button" id="refresh-button" type="button" aria-label="Refresh forecast and campus data" title="Refresh live telemetry">
+            <span class="tool-icon refresh-icon" aria-hidden="true">↻</span>
+          </button>
+
+          <!-- Mobile Command Hub Menu Toggle -->
+          <button class="nexus-mobile-toggle" id="menu-toggle" type="button" aria-label="Open navigation command hub" aria-expanded="false">
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+            <span class="toggle-bar"></span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- MOBILE SPATIAL DOCK (Floating ergonomic bottom quick-dock) -->
+    <nav class="mobile-spatial-dock" id="mobile-spatial-dock" aria-label="Mobile Quick Navigation">
+      <div class="mobile-dock-surface">
+        <button class="dock-btn is-active" type="button" data-view-target="dashboard" aria-label="Overview">
+          <span class="dock-icon" aria-hidden="true">⌂</span>
+          <span class="dock-label">Overview</span>
+        </button>
+        <button class="dock-btn" type="button" data-view-target="weather" aria-label="Weather & Air">
+          <span class="dock-icon" aria-hidden="true">☼</span>
+          <span class="dock-label">Weather</span>
+        </button>
+        <button class="dock-btn dock-btn-highlight" type="button" data-view-target="campus" aria-label="Campus Twin 3D">
+          <span class="dock-icon" aria-hidden="true">◇</span>
+          <span class="dock-label">3D Twin</span>
+        </button>
+        <button class="dock-btn" type="button" data-view-target="alerts" aria-label="Alerts">
+          <span class="dock-icon" aria-hidden="true">△</span>
+          <span class="dock-label">Alerts</span>
+          <span class="dock-badge" id="mobile-dock-alert-count" hidden>0</span>
+        </button>
+        <button class="dock-btn dock-hub-trigger" type="button" id="mobile-hub-btn" aria-label="All Navigation Modules" aria-haspopup="dialog" aria-expanded="false">
+          <span class="dock-icon" aria-hidden="true">㗊</span>
+          <span class="dock-label">Menu</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- FULLSCREEN MOBILE SPATIAL COMMAND OVERLAY -->
+    <div class="mobile-spatial-overlay" id="mobile-spatial-overlay" role="dialog" aria-modal="true" aria-label="Campus Command Navigation" hidden>
+      <div class="mobile-overlay-backdrop" id="mobile-overlay-backdrop"></div>
+      <div class="mobile-overlay-panel">
+        <div class="overlay-header">
+          <div class="overlay-brand">
+            <span class="crest-glyph">R</span>
+            <div>
+              <strong>RCERT DIGITAL TWIN 2.0</strong>
+              <small>Chandrapur, MH · DTE 4163</small>
+            </div>
+          </div>
+          <button class="overlay-close-btn" id="mobile-overlay-close-btn" type="button" aria-label="Close command navigation">✕</button>
+        </div>
+
+        <div class="overlay-destinations-grid">
+          <button class="overlay-tile is-active" type="button" data-view-target="dashboard">
+            <div class="tile-icon-wrap">⌂</div>
+            <div class="tile-content">
+              <strong>Overview</strong>
+              <small>Cinematic intro &amp; live weather metrics</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="weather">
+            <div class="tile-icon-wrap">☼</div>
+            <div class="tile-content">
+              <strong>Weather &amp; Air</strong>
+              <small>Open-Meteo forecasts &amp; CAMS air quality</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="campus">
+            <div class="tile-icon-wrap">◇</div>
+            <div class="tile-content">
+              <div class="tile-title-row">
+                <strong>Campus Twin</strong>
+                <span class="badge-3d">3D</span>
+              </div>
+              <small>18 spatial zones &amp; interactive WebGL</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="analytics">
+            <div class="tile-icon-wrap">⌁</div>
+            <div class="tile-content">
+              <strong>Analytics</strong>
+              <small>Weather trends and environmental analytics</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="alerts">
+            <div class="tile-icon-wrap">△</div>
+            <div class="tile-content">
+              <div class="tile-title-row">
+                <strong>Alerts Center</strong>
+                <span class="nav-count" id="overlay-alert-count" hidden>0</span>
+              </div>
+              <small>Thresholds &amp; environmental warnings</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="about">
+            <div class="tile-icon-wrap">ℹ</div>
+            <div class="tile-content">
+              <strong>About RCERT</strong>
+              <small>Accreditation, faculty &amp; history</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="reports">
+            <div class="tile-icon-wrap">▤</div>
+            <div class="tile-content">
+              <strong>Reports &amp; Export</strong>
+              <small>Weather, air-quality and alert reports</small>
+            </div>
+          </button>
+          <button class="overlay-tile" type="button" data-view-target="settings">
+            <div class="tile-icon-wrap">⚙</div>
+            <div class="tile-content">
+              <strong>Settings</strong>
+              <small>Display preferences, refresh configuration and system diagnostics</small>
+            </div>
+          </button>
+        </div>
+
+        <div class="overlay-footer-actions">
+          <button class="overlay-roadmap-action" type="button" id="mobile-open-roadmap-btn">
+            <span class="mini-label">FUTURE CAPABILITY</span>
+            <strong>Phase 2 Roadmap: CCTV &amp; Vision →</strong>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden compatibility anchor for legacy references -->
+    <div id="sidebar" class="sidebar-compat" hidden aria-hidden="true"></div>
+
+    <main class="main-content" id="main-content">
+
+      <div class="view-stack">
+        <!-- 1. OVERVIEW DASHBOARD -->
+        <section class="view is-visible" id="view-dashboard" data-view="dashboard" aria-labelledby="overview-title">
+          
+          <!-- CINEMATIC SCROLL-CONTROLLED FRAME ANIMATION STAGE -->
+          <section class="overview-cinematic-stage" id="overview-cinematic-stage" aria-label="RCERT Cinematic Campus Walkthrough">
+            <div class="cinematic-sticky-viewport">
+              <!-- High-Performance 1280x720 Canvas Layer -->
+              <canvas id="cinematic-canvas" class="cinematic-canvas" width="1280" height="720"></canvas>
+
+              <!-- Atmospheric Depth, Vignette & Gradient Overlays -->
+              <div class="cinematic-vignette-overlay" aria-hidden="true"></div>
+              <div class="cinematic-gradient-overlay" aria-hidden="true"></div>
+
+              <!-- Cinematic Narrative Storytelling Scenes (Synced to Scroll Scrub) -->
+              <div class="cinematic-narrative-container" id="cinematic-narrative-container">
+                <!-- Scene 01: Institutional Introduction -->
+                <article class="narrative-scene is-active" data-scene="1">
+                  <div class="scene-badge">
+                    <span class="badge-dot pulse"></span>
+                    <span>ESTABLISHED 1983 · DTE CODE 4163 · CHANDRAPUR</span>
+                  </div>
+                  <h1 class="scene-headline" id="overview-title">Rajiv Gandhi College of Engineering, Research &amp; Technology</h1>
+                  <p class="scene-subline">
+                    Babupeth, Ballarpur Road, Chandrapur, Maharashtra · Lat 19.9501° N · Lon 79.2993° E.
+                    Welcome to Central India's premier engineering institution, visualized through high-definition spatial intelligence.
+                  </p>
+                  <div class="scene-scroll-cue">
+                    <div class="cue-mouse"><div class="cue-wheel"></div></div>
+                    <span>Scroll naturally to enter the campus</span>
+                  </div>
+                </article>
+
+                <!-- Scene 02: Campus Entrance Gate -->
+                <article class="narrative-scene" data-scene="2">
+                  <div class="scene-badge">
+                    <span class="badge-dot"></span>
+                    <span>SCENE 01 · INSTITUTIONAL GATEWAY</span>
+                  </div>
+                  <h2 class="scene-headline">Main Entrance &amp; Pylons</h2>
+                  <p class="scene-subline">
+                    Arrival gateway situated along Ballarpur Highway featuring institutional terracotta pylons, security checkpoints, and visitor arrival pavilion.
+                  </p>
+                </article>
+
+                <!-- Scene 03: Academic Architecture & Atrium -->
+                <article class="narrative-scene" data-scene="3">
+                  <div class="scene-badge">
+                    <span class="badge-dot"></span>
+                    <span>SCENE 02 · ARCHITECTURAL FACADE</span>
+                  </div>
+                  <h2 class="scene-headline">Central Administration &amp; Portico</h2>
+                  <p class="scene-subline">
+                    Distinguished 3-tier building facade with terracotta accent piers, cream masonry, horizontal spandrel bands, and drive-through entrance canopy.
+                  </p>
+                </article>
+
+                <!-- Scene 04: Academic Quadrangle & Department Blocks -->
+                <article class="narrative-scene" data-scene="4">
+                  <div class="scene-badge">
+                    <span class="badge-dot"></span>
+                    <span>SCENE 03 · ACADEMIC QUADRANGLE</span>
+                  </div>
+                  <h2 class="scene-headline">Department Wings &amp; Inner Courtyards</h2>
+                  <p class="scene-subline">
+                    Connecting Computer Science, Information Technology, Electronics, Mechanical, and Mining Engineering around central shaded green spaces.
+                  </p>
+                </article>
+
+                <!-- Scene 05: Engineering Complex & Forest Fringe -->
+                <article class="narrative-scene" data-scene="5">
+                  <div class="scene-badge">
+                    <span class="badge-dot"></span>
+                    <span>SCENE 04 · ENGINEERING COMPLEX</span>
+                  </div>
+                  <h2 class="scene-headline">Workshops &amp; Forest Perimeter</h2>
+                  <p class="scene-subline">
+                    Extensive technical workshops with industrial gabled roofs, Central Library, and campus grounds bordered by Chandrapur's natural forest fringe.
+                  </p>
+                </article>
+
+                <!-- Scene 06: Spatial Intelligence & Dashboard Transition -->
+                <article class="narrative-scene" data-scene="6">
+                  <div class="scene-badge">
+                    <span class="badge-dot"></span>
+                    <span>SCENE 05 · SPATIAL &amp; ENVIRONMENTAL INTELLIGENCE</span>
+                  </div>
+                  <h2 class="scene-headline">Digital Twin 2.0 Operational Center</h2>
+                  <p class="scene-subline">
+                    Bridging physical campus infrastructure with real-time Open-Meteo meteorological forecasting, CAMS air quality telemetry, and interactive 3D spatial models.
+                  </p>
+                  <div class="scene-action-buttons">
+                    <a href="#weather" class="btn btn-primary" data-view-target="weather">
+                      <span>☼</span> <b>Explore Weather &amp; Air</b>
+                    </a>
+                    <a href="#campus" class="btn btn-secondary" data-view-target="campus">
+                      <span>⬡</span> <b>Launch Interactive 3D Twin</b>
+                    </a>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <!-- DASHBOARD CONTENT (TRANSITION AFTER CINEMATIC SCENE) -->
+          <div class="overview-dashboard-content" id="overview-dashboard-content">
+            <div class="dashboard-transition-divider">
+              <span class="divider-line"></span>
+              <span class="divider-badge">CAMPUS EXECUTIVE DASHBOARD</span>
+              <span class="divider-line"></span>
+            </div>
+
+            <div class="page-heading overview-heading">
+              <div>
+                <span class="eyebrow">CAMPUS INTELLIGENCE PLATFORM · RCERT CHANDRAPUR</span>
+                <h2>Real-Time Campus Telemetry</h2>
+                <p>Live meteorological intelligence, air quality forecasting, and conceptual spatial twin for Rajiv Gandhi College of Engineering, Research &amp; Technology.</p>
+              </div>
+              <div class="refresh-meta">
+                <span class="source-dot"></span>
+                <span id="overall-data-state">Connecting to Open-Meteo</span>
+              </div>
+            </div>
+
+            <div class="notice-banner" id="stale-banner" hidden role="status">
+              <span>↻</span>
+              <div>
+                <b>Displaying last verified forecast snapshot</b>
+                <small>External API request timed out; showing cached forecast data.</small>
+              </div>
+            </div>
+
+            <div class="notice-banner notice-error" id="error-banner" hidden role="alert">
+              <span>!</span>
+              <div>
+                <b>Forecast feed unavailable</b>
+                <small id="error-message">Unable to load meteorological forecast.</small>
+              </div>
+            </div>
+
+            <!-- Weather Hero Banner -->
+          <section class="weather-hero panel" aria-label="Current weather forecast">
+            <div class="weather-hero-main">
+              <div class="weather-place">
+                <span class="location-pin">⌖</span>
+                <div>
+                  <b>RCERT, Chandrapur</b>
+                  <small>19.9501° N · 79.2993° E · Babupeth, Ballarpur Road · Asia/Kolkata</small>
+                </div>
+              </div>
+              <div class="current-weather-line">
+                <div class="current-temp">
+                  <strong id="current-temp">--</strong>
+                  <span id="temp-unit-display">°C</span>
+                </div>
+                <div class="current-condition">
+                  <span class="weather-glyph" id="weather-glyph" aria-hidden="true">◌</span>
+                  <div>
+                    <b id="current-condition">Loading conditions…</b>
+                    <small>Feels like <span id="feels-like">--</span>°C · Dew point <span id="dew-point">--</span>°C</small>
+                  </div>
+                </div>
+              </div>
+              <div class="hero-source">
+                <span class="tag tag-forecast">LIVE METEOROLOGICAL FORECAST</span>
+                <span id="weather-source">Open-Meteo High-Resolution API</span>
+                <span class="stale-label" id="stale-label" hidden>CACHED</span>
+              </div>
+            </div>
+
+            <div class="weather-hero-stats">
+              <div class="hero-stat">
+                <span>Relative Humidity</span>
+                <b><span id="humidity">--</span><small>%</small></b>
+                <i class="stat-track"><em id="humidity-track"></em></i>
+              </div>
+              <div class="hero-stat">
+                <span>Wind Velocity</span>
+                <b><span id="wind-speed">--</span><small id="wind-unit-display">km/h</small></b>
+                <small class="stat-sub">Gusts up to <span id="wind-gust">--</span> km/h</small>
+              </div>
+              <div class="hero-stat">
+                <span>Precipitation Risk</span>
+                <b><span id="rain-prob">--</span><small>%</small></b>
+                <small class="stat-sub">Expected rainfall <span id="precip-val">0</span> mm</small>
+              </div>
+            </div>
+
+            <div class="hero-foot">
+              <span id="weather-updated">Fetching live meteorological data…</span>
+              <span class="hero-divider">·</span>
+              <a href="https://open-meteo.com/en/docs" target="_blank" rel="noreferrer">Open-Meteo Verified Source ↗</a>
+              <span class="hero-divider">·</span>
+              <span>Hardware-independent operation</span>
+            </div>
+          </section>
+
+          <!-- 8 Enterprise KPI Metric Cards -->
+          <div class="metric-grid-8" aria-label="Campus Environmental Key Performance Indicators">
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon warm">◉</span>
+                <span class="metric-label">TEMPERATURE</span>
+              </div>
+              <strong><span id="metric-temperature">--</span><small>°C</small></strong>
+              <span class="metric-note">Air temp @ 2 m</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon cool">◌</span>
+                <span class="metric-label">HUMIDITY</span>
+              </div>
+              <strong><span id="metric-humidity">--</span><small>%</small></strong>
+              <span class="metric-note">Relative saturation</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon orange">♨</span>
+                <span class="metric-label">FEELS LIKE</span>
+              </div>
+              <strong><span id="metric-feels-like">--</span><small>°C</small></strong>
+              <span class="metric-note">Heat index index</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon cyan">≈</span>
+                <span class="metric-label">WIND SPEED</span>
+              </div>
+              <strong><span id="metric-wind">--</span><small>km/h</small></strong>
+              <span class="metric-note">Surface level (10 m)</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon blue">☂</span>
+                <span class="metric-label">RAIN CHANCE</span>
+              </div>
+              <strong><span id="metric-rain-chance">--</span><small>%</small></strong>
+              <span class="metric-note">Precipitation prob</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon violet">◈</span>
+                <span class="metric-label">US AQI</span>
+              </div>
+              <strong><span id="metric-aqi">--</span><small>index</small></strong>
+              <span class="metric-note" id="aqi-label">Air quality forecast</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon green">⌁</span>
+                <span class="metric-label">PM2.5</span>
+              </div>
+              <strong><span id="metric-pm25">--</span><small>µg/m³</small></strong>
+              <span class="metric-note">Fine particulates · CAMS</span>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span class="metric-icon amber">⌬</span>
+                <span class="metric-label">PM10</span>
+              </div>
+              <strong><span id="metric-pm10">--</span><small>µg/m³</small></strong>
+              <span class="metric-note">Coarse particulates</span>
+            </article>
+          </div>
+
+          <!-- Forecast and Intelligence Row -->
+          <div class="content-grid overview-grid">
+            <section class="panel panel-pad" aria-labelledby="forecast-title">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">METEOROLOGICAL OUTLOOK</span>
+                  <h2 id="forecast-title">7-Day Campus Outlook</h2>
+                  <p>Daily diurnal temperatures and precipitation probabilities for Chandrapur.</p>
+                </div>
+                <button class="text-button" type="button" data-view-target="weather">Full Weather Analytics →</button>
+              </div>
+              <div class="forecast-row" id="forecast-row">
+                <div class="loading-row">Fetching daily forecast…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad intelligence-panel" aria-labelledby="insights-title">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">RULE-BASED INFERENCE</span>
+                  <h2 id="insights-title">Campus Intelligence Insights</h2>
+                  <p>Evidence-backed advisories derived from live meteorological thresholds.</p>
+                </div>
+                <span class="insight-mark">✦</span>
+              </div>
+              <div class="insights-list" id="insights-list">
+                <div class="loading-row">Evaluating meteorological thresholds…</div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Environmental Risk & Digital Twin Previews -->
+          <div class="content-grid risk-twin-grid">
+            <!-- Environmental Risk Matrix -->
+            <section class="panel panel-pad" aria-label="Environmental Risk Matrix">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">SAFETY & ENVIRONMENT</span>
+                  <h2>Environmental Risk Matrix</h2>
+                  <p>Operational safety indicators for outdoor campus movement.</p>
+                </div>
+              </div>
+              <div class="risk-matrix">
+                <div class="risk-cell" id="risk-thermal">
+                  <span class="risk-cell-title">Thermal Comfort</span>
+                  <strong class="risk-status">Calculating…</strong>
+                  <small class="risk-detail">Heat index evaluation</small>
+                </div>
+                <div class="risk-cell" id="risk-uv">
+                  <span class="risk-cell-title">Solar UV Exposure</span>
+                  <strong class="risk-status">Calculating…</strong>
+                  <small class="risk-detail">Peak radiation window</small>
+                </div>
+                <div class="risk-cell" id="risk-air">
+                  <span class="risk-cell-title">Air Quality Index</span>
+                  <strong class="risk-status">Calculating…</strong>
+                  <small class="risk-detail">CAMS atmospheric model</small>
+                </div>
+                <div class="risk-cell" id="risk-rain">
+                  <span class="risk-cell-title">Precipitation Hazard</span>
+                  <strong class="risk-status">Calculating…</strong>
+                  <small class="risk-detail">Surface runoff probability</small>
+                </div>
+              </div>
+            </section>
+
+            <!-- Campus Twin Action Card -->
+            <section class="panel twin-callout" aria-label="Campus twin shortcut">
+              <div class="callout-mark">◇</div>
+              <div>
+                <span class="eyebrow">DIGITAL TWIN &amp; CINEMATIC TOUR</span>
+                <h2>Spatial Zone Architecture &amp; Campus Tour</h2>
+                <p>Navigate the 18 academic and facility zones of RCERT in 3D or watch the cinematic campus walkthrough.</p>
+                <div class="twin-badges">
+                  <span class="tag tag-concept">18 Verified Zones</span>
+                  <span class="tag tag-verified">3D Spatial Model</span>
+                  <span class="tag tag-concept">HD Video Tour</span>
+                </div>
+              </div>
+              <div class="twin-callout-buttons">
+                <button class="primary-button" type="button" data-view-target="campus">
+                  Launch 3D Campus Twin <span>→</span>
+                </button>
+                <button class="subtle-button" type="button" id="overview-walkthrough-btn">
+                  ▶ Watch Walkthrough
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <p class="attribution">
+            Forecast data provided by <a href="https://open-meteo.com/en/license" target="_blank" rel="noreferrer">Open-Meteo</a>. Atmospheric estimates by Copernicus Atmosphere Monitoring Service (CAMS). Data is model-forecasted for institutional context; no physical sensors or cameras are deployed on campus.
+          </p>
+          </div>
+        </section>
+
+        <!-- 2. WEATHER & AIR QUALITY -->
+        <section class="view" id="view-weather" data-view="weather" aria-labelledby="weather-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">OPEN-METEO FORECAST & CAMS MODEL</span>
+              <h1 id="weather-title">Weather Intelligence & Air Quality</h1>
+              <p>Comprehensive meteorological telemetry, hourly curves, and atmospheric chemical concentrations for RCERT Chandrapur (19.9501° N, 79.2993° E).</p>
+            </div>
+            <span class="tag tag-forecast">MODEL FORECAST DATA</span>
+          </div>
+
+          <!-- Deep-dive Current Readings -->
+          <section class="panel panel-pad">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">CURRENT PARAMETERS</span>
+                <h2>Atmospheric Telemetry Overview</h2>
+                <p>Derived from high-resolution global numerical weather prediction models.</p>
+              </div>
+            </div>
+            <div class="weather-telemetry-grid">
+              <div class="telemetry-item">
+                <span>Dew Point</span>
+                <strong id="telem-dew">-- °C</strong>
+                <small>Moisture condensation point</small>
+              </div>
+              <div class="telemetry-item">
+                <span>Surface Pressure</span>
+                <strong id="telem-pressure">-- hPa</strong>
+                <small>Mean sea-level pressure</small>
+              </div>
+              <div class="telemetry-item">
+                <span>Cloud Coverage</span>
+                <strong id="telem-cloud">-- %</strong>
+                <small>Sky obscuration fraction</small>
+              </div>
+              <div class="telemetry-item">
+                <span>Visibility</span>
+                <strong id="telem-visibility">-- km</strong>
+                <small>Horizontal line-of-sight</small>
+              </div>
+              <div class="telemetry-item">
+                <span>Solar UV Index</span>
+                <strong id="telem-uv">--</strong>
+                <small>Peak midday radiation</small>
+              </div>
+              <div class="telemetry-item">
+                <span>Sunrise / Sunset</span>
+                <strong id="telem-sun">-- / --</strong>
+                <small>Local solar timings (IST)</small>
+              </div>
+            </div>
+          </section>
+
+          <!-- 24-Hour Interactive Charts -->
+          <section class="panel panel-pad" style="margin-top: 1.25rem;">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">NEXT 24 HOURS</span>
+                <h2>Hourly Meteorological Curves</h2>
+                <p>Hourly forecast trends in local Indian Standard Time (Asia/Kolkata).</p>
+              </div>
+            </div>
+            <div class="hourly-chart-grid">
+              <div class="chart-block">
+                <h3>Temperature Curve <small>(°C)</small></h3>
+                <div class="chart-wrap" id="weather-temp-chart">
+                  <div class="loading-row">Loading hourly temperature curve…</div>
+                </div>
+              </div>
+              <div class="chart-block">
+                <h3>Precipitation Probability <small>(%)</small></h3>
+                <div class="chart-wrap" id="weather-rain-chart">
+                  <div class="loading-row">Loading hourly precipitation probability…</div>
+                </div>
+              </div>
+              <div class="chart-block">
+                <h3>Relative Humidity <small>(%)</small></h3>
+                <div class="chart-wrap" id="weather-humidity-chart">
+                  <div class="loading-row">Loading hourly humidity curve…</div>
+                </div>
+              </div>
+              <div class="chart-block">
+                <h3>Wind Speed & Gusts <small>(km/h)</small></h3>
+                <div class="chart-wrap" id="weather-wind-chart">
+                  <div class="loading-row">Loading wind speed curve…</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Air Quality Deep Dive -->
+          <section class="panel panel-pad air-panel" style="margin-top: 1.25rem;">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">ATMOSPHERIC CHEMISTRY · CAMS ESTIMATE</span>
+                <h2>Air Quality & Atmospheric Composition</h2>
+                <p>Copernicus Atmosphere Monitoring Service (CAMS) regional air-quality projections.</p>
+              </div>
+              <span class="tag tag-forecast">MODEL ESTIMATE</span>
+            </div>
+            <div class="air-grid">
+              <article class="air-card air-primary">
+                <span>US AQI</span>
+                <strong id="air-us-aqi">--</strong>
+                <small id="air-us-label">Evaluating…</small>
+              </article>
+              <article class="air-card">
+                <span>PM2.5 (Fine)</span>
+                <strong><i id="air-pm25">--</i><small> µg/m³</small></strong>
+                <small>Particles &lt; 2.5 µm</small>
+              </article>
+              <article class="air-card">
+                <span>PM10 (Coarse)</span>
+                <strong><i id="air-pm10">--</i><small> µg/m³</small></strong>
+                <small>Particles &lt; 10 µm</small>
+              </article>
+              <article class="air-card">
+                <span>European AQI</span>
+                <strong id="air-eu-aqi">--</strong>
+                <small>EU standard index</small>
+              </article>
+              <article class="air-card">
+                <span>Ozone (O₃)</span>
+                <strong><i id="air-ozone">--</i><small> µg/m³</small></strong>
+                <small>Ground-level ozone</small>
+              </article>
+              <article class="air-card">
+                <span>Nitrogen Dioxide (NO₂)</span>
+                <strong><i id="air-no2">--</i><small> µg/m³</small></strong>
+                <small>Combustion byproduct</small>
+              </article>
+              <article class="air-card">
+                <span>Sulphur Dioxide (SO₂)</span>
+                <strong><i id="air-so2">--</i><small> µg/m³</small></strong>
+                <small>Industrial emissions</small>
+              </article>
+              <article class="air-card">
+                <span>Carbon Monoxide (CO)</span>
+                <strong><i id="air-co">--</i><small> µg/m³</small></strong>
+                <small>Incomplete combustion</small>
+              </article>
+            </div>
+            <div class="air-source-line">
+              <span>Source: <b id="air-source">Open-Meteo Air Quality API (CAMS)</b></span>
+              <span id="air-time">--</span>
+            </div>
+          </section>
+
+          <!-- 7-Day Outlook Breakdown -->
+          <section class="panel panel-pad" style="margin-top: 1.25rem;">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">7-DAY FORECAST MATRIX</span>
+                <h2>Extended Meteorological Forecast</h2>
+                <p>Projected maximum/minimum temperatures, rainfall volume, and weather descriptions.</p>
+              </div>
+            </div>
+            <div class="week-list" id="week-list">
+              <div class="loading-row">Loading extended daily forecast…</div>
+            </div>
+          </section>
+
+          <p class="attribution">
+            Weather and air quality data retrieved from Open-Meteo. Air quality calculations based on Copernicus Atmosphere Monitoring Service (CAMS). Not a certified environmental monitoring station.
+          </p>
+        </section>
+
+        <!-- 3. CAMPUS DIGITAL TWIN -->
+        <section class="view" id="view-campus" data-view="campus" aria-labelledby="campus-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">INTERACTIVE THREE.JS SPATIAL ENGINE · 18 FUNCTIONAL ZONES</span>
+              <h1 id="campus-title">RCERT Campus Digital Twin</h1>
+              <p>Explore the 18 zones of Rajiv Gandhi College of Engineering, Research &amp; Technology interactively in 3D WebGL.</p>
+            </div>
+            <div class="heading-actions">
+              <span class="tag tag-verified">PBR WEBGL ENGINE ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE 3D TWIN -->
+          <div class="campus-3d-experience" id="campus-3d-experience">
+            <div class="campus-layout">
+              <section class="panel twin-panel" aria-label="Interactive 3D campus model">
+                <!-- Map Toolbar -->
+                <div class="map-toolbar">
+                  <div class="map-search-wrap">
+                    <input type="text" id="campus-search" class="map-search-input" placeholder="Search zone (e.g. Computer Science, Library)…" aria-label="Search campus zones">
+                  </div>
+                  <div class="map-filter-chips" id="zone-filter-chips">
+                    <button class="chip is-active" type="button" data-filter="all">All</button>
+                    <button class="chip" type="button" data-filter="Academic">Academic</button>
+                    <button class="chip" type="button" data-filter="Administration">Administration</button>
+                    <button class="chip" type="button" data-filter="Facility">Facilities</button>
+                    <button class="chip" type="button" data-filter="Hostel">Hostels</button>
+                    <button class="chip" type="button" data-filter="Parking">Parking</button>
+                  </div>
+                  <div class="map-toolbar-actions">
+                    <span class="map-state"><i></i><span id="map-state">Initializing 3D scene…</span></span>
+                    <button class="subtle-button" type="button" id="reset-camera" title="Reset Camera Orientation">Reset View</button>
+                    <button class="subtle-button" type="button" id="toggle-fullscreen-map" title="Toggle 3D Viewport Fullscreen">⛶ Fullscreen</button>
+                    <button class="subtle-button" type="button" id="toggle-view-mode" title="Toggle 2D/3D Mode">2D View</button>
+                  </div>
+                </div>
+
+                <!-- 3D Scene Viewport -->
+                <div class="scene-wrap" id="campus-scene-wrap">
+                  <div id="campus-scene" class="campus-scene" aria-label="Interactive 3D campus model" role="img"></div>
+                  <div id="campus-fallback" class="campus-fallback" hidden></div>
+                  <div class="scene-compass" aria-hidden="true"><span>N</span><i>↑</i></div>
+                  <div class="scene-controls-hint">Orbit: Left Click + Drag · Pan: Right Click + Drag · Zoom: Scroll · Inspect: Click Building</div>
+                  <div class="scene-note">Authentic architectural reconstruction based on verified RCERT Chandrapur references</div>
+                </div>
+
+                <div class="map-legend">
+                  <span><i class="legend-square academic"></i>Academic</span>
+                  <span><i class="legend-square administration"></i>Administration</span>
+                  <span><i class="legend-square facility"></i>Facilities</span>
+                  <span><i class="legend-square hostel"></i>Hostels</span>
+                  <span><i class="legend-square parking"></i>Parking</span>
+                  <span><i class="legend-square entrance"></i>Main Gate</span>
+                </div>
+              </section>
+
+              <!-- Zone Inspector Panel -->
+              <aside class="panel zone-panel" aria-label="Selected campus zone">
+                <div class="zone-panel-head">
+                  <span class="eyebrow">ZONE INSPECTOR</span>
+                  <span class="tag tag-verified" id="zone-tag">ACTIVE ZONE</span>
+                </div>
+                <div class="selected-zone-summary">
+                  <span class="zone-orb" id="selected-zone-orb">◇</span>
+                  <div>
+                    <h2 id="selected-zone-name">Select a Campus Zone</h2>
+                    <small id="selected-zone-type">Click any building or chip to inspect</small>
+                  </div>
+                </div>
+
+                <!-- Zone Visual Reference Photographic Preview -->
+                <div class="zone-photo-card" id="zone-photo-card">
+                  <div class="zone-photo-wrap">
+                    <img id="zone-photo-img" src="{{ url_for('static', filename='assets/campus/posters/facade-poster.jpg') }}" alt="RCERT Campus Architectural Reference" loading="lazy">
+                    <span class="zone-photo-badge" id="zone-photo-badge">ARCHITECTURAL REFERENCE</span>
+                  </div>
+                  <div class="zone-photo-caption" id="zone-photo-caption">
+                    RCERT Main Administration Building Facade &amp; Terrace
+                  </div>
+                </div>
+
+                <p class="zone-note" id="selected-zone-note">
+                  Select any campus zone to view its academic department, laboratories, and infrastructure specifications.
+                </p>
+
+                <!-- Department Facilities Pill List -->
+                <div class="zone-facilities-block" id="zone-facilities-block" hidden>
+                  <span class="mini-label">KEY LABORATORIES &amp; FACILITIES</span>
+                  <div class="facilities-tags" id="zone-facilities-tags"></div>
+                </div>
+
+                <div class="zone-info-grid">
+                  <div>
+                    <span>Geometry</span>
+                    <b>Architectural 3D</b>
+                  </div>
+                  <div>
+                    <span>Zone Classification</span>
+                    <b id="zone-type-badge">Academic</b>
+                  </div>
+                  <div>
+                    <span>Campus Weather</span>
+                    <b id="zone-weather">-- °C</b>
+                  </div>
+                  <div>
+                    <span>Data Provenance</span>
+                    <b>Verified RCERT Registry</b>
+                  </div>
+                </div>
+
+                <div class="zone-list-head">
+                  <b>Campus Zones Directory</b>
+                  <span id="zone-count">18 zones</span>
+                </div>
+                <div class="zone-list" id="zone-list">
+                  <div class="loading-row">Loading campus directory…</div>
+                </div>
+
+                <div class="optional-module">
+                  <div class="optional-icon">✦</div>
+                  <div>
+                    <b>Phase 1 Hardware Independence</b>
+                    <p>All campus twin structures operate without requiring physical telemetry or CCTV cameras.</p>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <p class="attribution">
+            Zone registry based on official RCERT campus landmarks. 3D geometry is an architectural reconstruction based on verified photographic references.
+          </p>
+        </section>
+
+        <!-- 4. ADVANCED CAMPUS ANALYTICS -->
+        <section class="view" id="view-analytics" data-view="analytics" aria-labelledby="analytics-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">DATA ANALYSIS & METEOROLOGICAL INTELLIGENCE</span>
+              <h1 id="analytics-title">Advanced Campus Analytics</h1>
+              <p>Correlation analysis, historical snapshot evaluation, and meteorological variance indicators for the RCERT campus.</p>
+            </div>
+            <div class="filter-row">
+              <label class="select-wrap">
+                Analytics Window
+                <select id="analytics-timeframe">
+                  <option value="24h" selected>Next 24 Hours (Hourly)</option>
+                  <option value="7d">Next 7 Days (Daily)</option>
+                  <option value="history">Historical Stored Snapshots</option>
+                </select>
+              </label>
+              <a class="subtle-button export-link" id="analytics-export-btn" href="/api/reports/weather.csv">
+                Export Raw Data (CSV)
+              </a>
+            </div>
+          </div>
+
+          <!-- Multi-Series Analytics Grid -->
+          <div class="content-grid analytics-full-grid">
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">THERMAL CURVE</span>
+                  <h2>Temperature & Heat Index Trend</h2>
+                  <p>Hourly ambient air temperature vs apparent temperature.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-temp-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">PRECIPITATION RISK</span>
+                  <h2>Precipitation Probability & Rain Volume</h2>
+                  <p>Rainfall likelihood and expected millimeter accumulations.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-rain-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">ATMOSPHERIC MOISTURE</span>
+                  <h2>Relative Humidity & Dew Point Correlation</h2>
+                  <p>Atmospheric moisture saturation progression.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-humidity-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">WIND PATTERNS</span>
+                  <h2>Wind Velocity & Gust Profiles</h2>
+                  <p>Sustained surface winds and maximum projected gusts.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-wind-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">SOLAR RADIATION</span>
+                  <h2>Diurnal UV Index Profile</h2>
+                  <p>Midday solar UV intensity curve and peak protection thresholds.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-uv-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">PARTICULATE MATTER</span>
+                  <h2>PM2.5 vs PM10 Concentration</h2>
+                  <p>Fine vs coarse particulate matter projections from CAMS.</p>
+                </div>
+              </div>
+              <div class="chart-wrap" id="analytics-pm-chart">
+                <div class="loading-row">Rendering analytics curve…</div>
+              </div>
+            </section>
+          </div>
+
+          <p class="attribution">
+            Analytical models derived from Open-Meteo hourly meteorological and CAMS air quality datasets. Stored historical records are safely persisted in SQLite.
+          </p>
+        </section>
+
+        <!-- 5. ALERTS & NOTIFICATIONS CENTER -->
+        <section class="view" id="view-alerts" data-view="alerts" aria-labelledby="alerts-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">PERSISTENT EVENT & ADVISORY REGISTER</span>
+              <h1 id="alerts-title">Alert & Advisory Center</h1>
+              <p>Threshold-based meteorological advisories, environmental alerts, and system health status persisted in SQLite.</p>
+            </div>
+            <div class="filter-row">
+              <input type="text" id="alert-search-box" class="subtle-input" placeholder="Search alerts…" aria-label="Search alerts">
+              <label class="select-wrap">
+                Status
+                <select id="alert-state">
+                  <option value="active" selected>Active Advisories</option>
+                  <option value="unread">Unread</option>
+                  <option value="acknowledged">Acknowledged</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="all">All Records</option>
+                </select>
+              </label>
+              <label class="select-wrap">
+                Severity
+                <select id="alert-severity-filter">
+                  <option value="all" selected>All Severities</option>
+                  <option value="critical">Critical</option>
+                  <option value="warning">Warning</option>
+                  <option value="info">Info</option>
+                </select>
+              </label>
+              <button class="subtle-button" id="refresh-alerts" type="button">Refresh Advisories</button>
+            </div>
+          </div>
+
+          <div class="alert-summary-strip">
+            <span class="status-dot" id="alerts-status-dot"></span>
+            <b id="alerts-summary">Evaluating alert register…</b>
+            <small id="alerts-updated">--</small>
+          </div>
+
+          <div class="alerts-list" id="alerts-list">
+            <div class="loading-row">Loading persistent alerts…</div>
+          </div>
+        </section>
+
+        <!-- 6. ABOUT RCERT (Included via sub-template) -->
+        {% include 'about.html' %}
+
+        <!-- 7. REPORTS & DATA EXPORT -->
+        <section class="view" id="view-reports" data-view="reports" aria-labelledby="reports-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">DATA EXPORT & COMPLIANCE REPORTS</span>
+              <h1 id="reports-title">Reports & Data Exports</h1>
+              <p>Generate print-ready executive summaries and export structured datasets in CSV and JSON formats.</p>
+            </div>
+            <div class="filter-row">
+              <button class="primary-button" id="print-report-btn" type="button">
+                <span>🖨️</span> Print / Save as PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="content-grid reports-grid">
+            <!-- Report Type Selection -->
+            <section class="panel panel-pad reports-selector-panel">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">CHOOSE REPORT</span>
+                  <h2>Executive Report Catalog</h2>
+                  <p>Select a report format to preview and download.</p>
+                </div>
+              </div>
+              <div class="report-options">
+                <button class="report-opt-btn is-active" type="button" data-report-type="weather-summary">
+                  <b>Campus Weather & Meteorological Summary</b>
+                  <small>Comprehensive current telemetry, hourly forecasts, and UV indicators.</small>
+                </button>
+                <button class="report-opt-btn" type="button" data-report-type="air-quality">
+                  <b>Air Quality & Environmental Health Audit</b>
+                  <small>CAMS atmospheric concentrations (PM2.5, PM10, AQI, O₃, NO₂, SO₂, CO).</small>
+                </button>
+                <button class="report-opt-btn" type="button" data-report-type="seven-day">
+                  <b>7-Day Meteorological Forecast Outlook</b>
+                  <small>Extended weekly forecast table with diurnal extremes and precipitation chances.</small>
+                </button>
+                <button class="report-opt-btn" type="button" data-report-type="alerts-audit">
+                  <b>Campus Advisories & Incident Audit Log</b>
+                  <small>Complete record of active, acknowledged, and resolved campus alerts.</small>
+                </button>
+                <button class="report-opt-btn" type="button" data-report-type="system-health">
+                  <b>Digital Twin 2.0 System Health & Provenance Report</b>
+                  <small>Database integrity, API latency, and data stewardship compliance manifest.</small>
+                </button>
+              </div>
+
+              <div class="export-actions-box">
+                <span class="mini-label">DIRECT EXPORT FILES</span>
+                <div class="export-btn-group">
+                  <a class="subtle-button" id="btn-export-weather-csv" href="/api/reports/weather.csv" download>
+                    📥 Weather CSV
+                  </a>
+                  <a class="subtle-button" id="btn-export-air-csv" href="/api/reports/air-quality.csv" download>
+                    📥 Air Quality CSV
+                  </a>
+                  <a class="subtle-button" id="btn-export-alerts-csv" href="/api/reports/alerts.csv" download>
+                    📥 Alerts CSV
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <!-- Report Document Preview -->
+            <section class="panel panel-pad report-document-panel" id="report-document-panel">
+              <div class="report-doc-header">
+                <div class="report-doc-brand">
+                  <span class="brand-mark-sm">R</span>
+                  <div>
+                    <h3>RAJIV GANDHI COLLEGE OF ENGINEERING, RESEARCH & TECHNOLOGY</h3>
+                    <p>BABUPETH, CHANDRAPUR, MAHARASHTRA 442403 · DIGITAL TWIN 2.0</p>
+                  </div>
+                </div>
+                <div class="report-doc-meta">
+                  <span id="report-doc-timestamp">Date: --</span>
+                  <span>Classification: Official Report</span>
+                </div>
+              </div>
+
+              <h2 id="report-doc-title" class="report-doc-title">Campus Meteorological Summary Report</h2>
+
+              <div id="report-doc-body" class="report-doc-body">
+                <div class="loading-row">Preparing report document…</div>
+              </div>
+
+              <div class="report-doc-footer">
+                <span>RCERT Smart Campus Digital Twin 2.0 · Automated Executive Report</span>
+                <span>Source: Open-Meteo & RCERT Institutional Registry</span>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- 8. SYSTEM SETTINGS -->
+        <section class="view" id="view-settings" data-view="settings" aria-labelledby="settings-title" hidden>
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">APPLICATION PREFERENCES & DIAGNOSTICS</span>
+              <h1 id="settings-title">System Settings & Health</h1>
+              <p>Configure units of measure, refresh frequencies, display density, and inspect real-time service health.</p>
+            </div>
+            <button class="primary-button" id="save-settings-btn" type="button">Save Preferences</button>
+          </div>
+
+          <div class="content-grid settings-grid">
+            <!-- Preferences Form -->
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">MEASUREMENT & DISPLAY</span>
+                  <h2>Measurement Units & Preferences</h2>
+                  <p>Tailor the display units across all dashboard visualizations.</p>
+                </div>
+              </div>
+
+              <div class="settings-form">
+                <div class="settings-field">
+                  <label for="pref-temp-unit">
+                    <b>Temperature Unit</b>
+                    <small>Default unit for ambient, feels-like, and forecast temperatures.</small>
+                  </label>
+                  <select id="pref-temp-unit" class="subtle-input">
+                    <option value="celsius" selected>Celsius (°C)</option>
+                    <option value="fahrenheit">Fahrenheit (°F)</option>
+                  </select>
+                </div>
+
+                <div class="settings-field">
+                  <label for="pref-wind-unit">
+                    <b>Wind Velocity Unit</b>
+                    <small>Default unit for wind speed and gust velocity indicators.</small>
+                  </label>
+                  <select id="pref-wind-unit" class="subtle-input">
+                    <option value="kmh" selected>Kilometers per hour (km/h)</option>
+                    <option value="ms">Meters per second (m/s)</option>
+                    <option value="mph">Miles per hour (mph)</option>
+                  </select>
+                </div>
+
+                <div class="settings-field">
+                  <label for="pref-refresh-interval">
+                    <b>Background Refresh Interval</b>
+                    <small>Frequency of automatic meteorological synchronization.</small>
+                  </label>
+                  <select id="pref-refresh-interval" class="subtle-input">
+                    <option value="60">Every 1 Minute</option>
+                    <option value="300" selected>Every 5 Minutes (Recommended)</option>
+                    <option value="600">Every 10 Minutes</option>
+                    <option value="0">Manual Refresh Only</option>
+                  </select>
+                </div>
+
+                <div class="settings-field">
+                  <label for="pref-render-quality">
+                    <b>3D Campus Graphics Quality</b>
+                    <small>Adjust WebGL antialiasing and shadow density.</small>
+                  </label>
+                  <select id="pref-render-quality" class="subtle-input">
+                    <option value="high" selected>High (Antialiasing + Full Lighting)</option>
+                    <option value="medium">Medium (Optimized for laptops)</option>
+                    <option value="low">2D Fallback Mode</option>
+                  </select>
+                </div>
+
+                <div class="settings-field">
+                  <label for="pref-theme">
+                    <b>Interface Theme</b>
+                    <small>Choose visual theme presentation.</small>
+                  </label>
+                  <select id="pref-theme" class="subtle-input">
+                    <option value="dark" selected>Enterprise Obsidian Dark</option>
+                    <option value="contrast">High Contrast Mode</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- API Diagnostics & Health -->
+            <section class="panel panel-pad">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">LIVE DIAGNOSTICS</span>
+                  <h2>Service Health & Provenance</h2>
+                  <p>Real-time connectivity tests and data source verification.</p>
+                </div>
+                <button class="subtle-button" id="run-diagnostics-btn" type="button">Run Ping Diagnostics</button>
+              </div>
+
+              <div class="diagnostics-list">
+                <div class="diag-item">
+                  <div class="diag-left">
+                    <span class="status-dot is-ok" id="diag-db-dot"></span>
+                    <div>
+                      <b>SQLite Local Database</b>
+                      <small id="diag-db-detail">database/campus.db · WAL mode active</small>
+                    </div>
+                  </div>
+                  <span class="diag-badge is-ok" id="diag-db-badge">CONNECTED</span>
+                </div>
+
+                <div class="diag-item">
+                  <div class="diag-left">
+                    <span class="status-dot is-ok" id="diag-weather-dot"></span>
+                    <div>
+                      <b>Open-Meteo Weather API</b>
+                      <small>https://api.open-meteo.com/v1/forecast</small>
+                    </div>
+                  </div>
+                  <span class="diag-badge is-ok" id="diag-weather-badge">200 OK</span>
+                </div>
+
+                <div class="diag-item">
+                  <div class="diag-left">
+                    <span class="status-dot is-ok" id="diag-air-dot"></span>
+                    <div>
+                      <b>Open-Meteo Air Quality (CAMS)</b>
+                      <small>https://air-quality-api.open-meteo.com/v1/air-quality</small>
+                    </div>
+                  </div>
+                  <span class="diag-badge is-ok" id="diag-air-badge">200 OK</span>
+                </div>
+
+                <div class="diag-item">
+                  <div class="diag-left">
+                    <span class="status-dot is-ok" id="diag-twin-dot"></span>
+                    <div>
+                      <b>3D Spatial Campus Engine (Three.js WebGL)</b>
+                      <small>18 Verified Architectural Zones &amp; PBR Renderer</small>
+                    </div>
+                  </div>
+                  <span class="diag-badge is-ok" id="diag-twin-badge">ACTIVE</span>
+                </div>
+              </div>
+
+              <!-- Data Provenance Principles -->
+              <div class="provenance-box" style="margin-top: 1.25rem;">
+                <span class="mini-label">DATA PROVENANCE PRINCIPLES</span>
+                <ul class="provenance-rules">
+                  <li><b>Zero Fabrication:</b> No fake electricity, water, or occupancy meters.</li>
+                  <li><b>Graceful Degradation:</b> Cached forecasts with stale notices on connection drops.</li>
+                  <li><b>Attribution:</b> Full compliance with Open-Meteo CC BY 4.0 terms.</li>
+                  <li><b>Privacy by Design:</b> No facial recognition or persistent biometric identifiers.</li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+
+      <footer class="page-footer">
+        <span>RCERT Smart Campus Digital Twin 2.0 · Rajiv Gandhi College of Engineering, Research & Technology</span>
+        <button class="footer-roadmap-btn" id="open-roadmap-btn" type="button" title="View CCTV & Computer Vision Phase 2 Roadmap">
+          <span class="roadmap-badge-dot" aria-hidden="true"></span> Phase 2 Roadmap: CCTV &amp; Vision →
+        </button>
+        <span>Forecasts are model estimates · Hardware-independent architecture</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Phase 2 Roadmap Modal -->
+  <div class="modal-backdrop" id="modal-roadmap" hidden style="display: none;" role="dialog" aria-modal="true" aria-labelledby="roadmap-dialog-title">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">FUTURE DEVELOPMENT ROADMAP</span>
+          <h2 id="roadmap-dialog-title">Phase 2: CCTV & Computer Vision Architecture</h2>
+        </div>
+        <button class="modal-close-btn" id="close-roadmap-btn" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="roadmap-notice">
+          <span class="roadmap-icon">📹</span>
+          <div>
+            <b>Intentional Architectural Deferral</b>
+            <p>To ensure 100% hardware-independent reliability for academic demonstration, computer vision and CCTV camera streaming are scheduled for physical deployment in Phase 2.</p>
+          </div>
+        </div>
+
+        <h3>Planned Phase 2 Specifications:</h3>
+        <ul class="roadmap-feature-list">
+          <li><b>Hardware Requirements:</b> Authorized ONVIF/RTSP IP cameras connected across campus gates and corridors.</li>
+          <li><b>Local Edge Inference:</b> Ultralytics YOLO11n ONNX runtime processing transient JPEG streams on local GPU hardware.</li>
+          <li><b>Anonymous Tripwire Tracking:</b> Virtual entry/exit lines measuring directional pedestrian movement.</li>
+          <li><b>Privacy-First Protocol:</b> Zero facial recognition, zero biometric logging, and zero permanent video storage.</li>
+          <li><b>Graceful Fallback:</b> Digital Twin continues operating smoothly even when physical cameras are powered off.</li>
+        </ul>
+
+        <div class="roadmap-footer-note">
+          Phase 1 is complete and operates independently of physical camera hardware.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="primary-button" id="dismiss-roadmap-btn" type="button">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-scrim" id="mobile-scrim" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

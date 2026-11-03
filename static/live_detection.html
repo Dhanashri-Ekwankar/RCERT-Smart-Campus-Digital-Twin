@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCERT Live Person Detection</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background: #0b1220;
+            color: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .panel {
+            max-width: 950px;
+            margin: auto;
+            background: #151f30;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        h1 { margin-top: 0; }
+
+        .status {
+            color: #7dd3fc;
+            margin: 15px 0;
+        }
+
+        .camera {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        video {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .count {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 18px 0;
+        }
+
+        button {
+            background: #0d9488;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        button:disabled { opacity: 0.5; }
+
+        .note {
+            color: #b8c4d8;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+<div class="panel">
+    <h1>RCERT Smart Campus</h1>
+    <p>Real-Time Computer Vision — Person Detection</p>
+
+    <div id="status" class="status">Loading AI model...</div>
+
+    <button id="startBtn" disabled>Start Camera</button>
+    <button id="stopBtn" disabled>Stop Camera</button>
+
+    <div class="count">
+        Persons Detected: <span id="count">0</span>
+    </div>
+
+    <div class="camera">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <p class="note">
+        Live webcam inference. Only detections labelled "person"
+        with confidence of at least 55% are counted.
+        Detection may still produce occasional false positives or
+        miss people, depending on lighting and camera angle.
+    </p>
+</div>
+
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const statusText = document.getElementById("status");
+const countText = document.getElementById("count");
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+let model = null;
+let stream = null;
+let running = false;
+
+async function loadModel() {
+    try {
+        statusText.textContent = "Loading AI model. Internet required...";
+        model = await cocoSsd.load({ base: "lite_mobilenet_v2" });
+        statusText.textContent = "AI model ready. Click Start Camera.";
+        startBtn.disabled = false;
+    } catch (error) {
+        statusText.textContent =
+            "Model loading failed. Check internet and reload this page.";
+        console.error(error);
+    }
+}
+
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: false
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        running = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+        statusText.textContent = "Camera active. Detecting people...";
+        detectLoop();
+    } catch (error) {
+        statusText.textContent =
+            "Camera unavailable. Allow camera permission in your browser.";
+        console.error(error);
+    }
+}
+
+async function detectLoop() {
+    while (running) {
+        if (video.readyState >= 2 && model) {
+            try {
+                const predictions = await model.detect(video);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const people = predictions.filter(
+                    item => item.class === "person" && item.score >= 0.55
+                );
+
+                for (const person of people) {
+                    const [x, y, width, height] = person.bbox;
+
+                    ctx.strokeStyle = "#22c55e";
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(x, y, width, height);
+
+                    ctx.fillStyle = "#22c55e";
+                    ctx.font = "bold 16px Arial";
+
+                    ctx.fillText(
+                        `PERSON ${Math.round(person.score * 100)}%`,
+                        x,
+                        Math.max(20, y - 7)
+                    );
+                }
+
+                countText.textContent = people.length;
+                statusText.textContent = "Live detection running";
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = "Detection error. Check console.";
+                break;
+            }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 120));
+    }
+}
+
+function stopCamera() {
+    running = false;
+
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+
+    video.srcObject = null;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    countText.textContent = "0";
+
+    startBtn.disabled = !model;
+    stopBtn.disabled = true;
+    statusText.textContent = "Camera stopped.";
+}
+
+startBtn.addEventListener("click", startCamera);
+stopBtn.addEventListener("click", stopCamera);
+
+window.addEventListener("beforeunload", () => {
+    if (stream) stream.getTracks().forEach(track => track.stop());
+});
+
+loadModel();
+</script>
+</body>
+</html>
