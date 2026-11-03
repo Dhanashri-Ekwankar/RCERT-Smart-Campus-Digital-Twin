@@ -72,3 +72,6 @@ Thumbs.db
 # Temporary Audit Outputs
 test_screenshots/
 navbar_audit_screenshots/
+
+.vercel
+.env*
